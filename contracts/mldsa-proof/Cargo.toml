@@ -1,0 +1,19 @@
+[package]
+name = "helixbox-mldsa-proof"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = "=30.0.0-rc.1"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+strip = "symbols"
+lto = true
+codegen-units = 1
+panic = "abort"
