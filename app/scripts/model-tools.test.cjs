@@ -19,11 +19,11 @@ function load(manager, fetcher) {
   return module.exports;
 }
 
-test('never falls back to the old live manager', async()=>{
-  let calls=0;
-  const api=load('',async()=>{calls++;return Response.json({});});
-  await assert.rejects(api.modelRequest(''), /separate Stellar manager/i);
-  assert.equal(calls,0);
+test('uses the Stellar manager by default, never the old deployment', async()=>{
+  let url='';
+  const api=load('',async value=>{url=String(value);return Response.json({});});
+  await api.modelRequest('');
+  assert.equal(url,'https://helixbox-stellar-manager-43f4.onrender.com/v2/models');
 });
 
 test('does not make a model purchase while Stellar payments are disabled', async()=>{

@@ -14,7 +14,7 @@ try {
   });
 }
 
-const DEFAULT_GATEWAY_WS_URL = process.env.EXPO_PUBLIC_GATEWAY_URL || '';
+const DEFAULT_GATEWAY_WS_URL = process.env.EXPO_PUBLIC_GATEWAY_URL || 'wss://helixbox-stellar-proxy-43f4.onrender.com';
 
 // ============================================================================
 // Types

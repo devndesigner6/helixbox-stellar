@@ -12,7 +12,7 @@ export interface ModelPurchase {
   transaction:string|null;error:string|null;commitmentId?:string|null;channelId?:string|null;
   result:{kind:ModelKind;text?:string;base64?:string;mediaType?:string;generationId:string|null;providerCost:number|null}|null;
 }
-export const MODEL_MANAGER_URL = process.env.EXPO_PUBLIC_MANAGER_URL || '';
+export const MODEL_MANAGER_URL = process.env.EXPO_PUBLIC_MANAGER_URL || 'https://helixbox-stellar-manager-43f4.onrender.com';
 const MANAGER=MODEL_MANAGER_URL;
 export function formatUSDC(amount:string):string {
   return formatStellarUSDC(amount);
