@@ -9,6 +9,7 @@ import {
 } from "crypto";
 import { existsSync, rmSync, readFileSync, realpathSync } from "fs";
 import { persistentModelStore, assertFinancialResetSafe } from './model-storage-safety.ts';
+import { bootstrapConfiguredProxies } from './proxy-bootstrap.ts';
 import { createX402App } from "./x402-app.js";
 import { createPaymentReceiptStore } from "./payment-receipts.js";
 import { createModelApp } from "./model-app.ts";
@@ -1219,9 +1220,7 @@ async function startManager(): Promise<void> {
     WHERE ts < ?1
   `);
 
-  for (const proxy of configured) {
-    addProxyStmt.run(proxy, "");
-  }
+  bootstrapConfiguredProxies(configured, (process.env.PROXY_PASSWORD || '').trim(), (url, password) => addProxyStmt.run(url, password));
 
   const rateLimitBuckets = new Map<
     string,

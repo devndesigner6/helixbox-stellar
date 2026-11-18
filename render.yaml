@@ -1,0 +1,47 @@
+envVarGroups:
+  - name: helixbox-stellar-shared
+    envVars:
+      - key: PROXY_PASSWORD
+        generateValue: true
+
+services:
+  - type: web
+    name: helixbox-stellar-manager
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./manager/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: helixbox-stellar-shared
+      - key: MANAGER_ADMIN_PASSWORD
+        generateValue: true
+      - key: MODEL_DATA_KEY
+        generateValue: true
+      - key: MODEL_ENABLE_PAYMENTS
+        value: 'false'
+      - key: PROXIES
+        fromService:
+          name: helixbox-stellar-proxy
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: helixbox-stellar-proxy
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./proxy/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: helixbox-stellar-shared
+      - key: MANAGER_URL
+        fromService:
+          name: helixbox-stellar-manager
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: PUBLIC_URL
+        fromService:
+          name: helixbox-stellar-proxy
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
