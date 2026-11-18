@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getWalletStatus, removeWalletStatus, type WalletStatus } from "@/lib/wallet-status";
+import { getWalletStatus, saveWalletStatus, removeWalletStatus, type WalletStatus } from "@/lib/wallet-status";
+import { connectStellarWallet, disconnectStellarWallet } from "@/lib/stellar-wallet";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Wallet } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -15,13 +16,13 @@ export default function WalletSettingsPage() {
   useFocusEffect(useCallback(() => { void getWalletStatus().then(setWallet); }, []));
   const connectWallet = async () => {
     setBusy(true); setError(null);
-    try { throw new Error('Stellar wallet connection is not available yet'); }
+    try { const connected = { address: await connectStellarWallet(), network: "Mainnet" as const }; await saveWalletStatus(connected); setWallet(connected); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "MetaMask connection failed"); }
     finally { setBusy(false); }
   };
   const disconnectWallet = async () => {
     setBusy(true); setError(null);
-    try { await removeWalletStatus(); setWallet(null); }
+    try { await disconnectStellarWallet(); await removeWalletStatus(); setWallet(null); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "MetaMask disconnect failed"); }
     finally { setBusy(false); }
   };
@@ -29,9 +30,9 @@ export default function WalletSettingsPage() {
     <Header title="Wallet Connection" colors={colors} onBack={() => router.back()} />
     <View style={{ margin: 16, padding: 16, gap: 10, backgroundColor: colors.bg.raised, borderRadius: 10 }}>
       <Wallet color={colors.accent.default} size={22} />
-      <Text style={{ color: colors.fg.default, fontFamily: fonts.sans.semibold, fontSize: 16 }}>{wallet ? "Previously saved wallet" : "No wallet saved"}</Text>
-      <Text style={{ color: colors.fg.muted, fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 }}>Stellar wallet connection is not available yet.</Text>
-      <Pressable disabled onPress={connectWallet} style={{ backgroundColor: colors.accent.default, borderRadius: 10, padding: 12, opacity: .5 }}><Text style={{ color: colors.fg.default, fontFamily: fonts.sans.semibold, textAlign: "center" }}>Stellar wallet coming soon</Text></Pressable>
+      <Text style={{ color: colors.fg.default, fontFamily: fonts.sans.semibold, fontSize: 16 }}>{wallet ? "Saved Stellar wallet" : "No wallet saved"}</Text>
+      <Text style={{ color: colors.fg.muted, fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 }}>{wallet ? `${wallet.network} · ${wallet.address}` : 'Connect MetaMask on Stellar mainnet. Model payments are not enabled yet.'}</Text>
+      <Pressable disabled={busy} onPress={connectWallet} style={{ backgroundColor: colors.accent.default, borderRadius: 10, padding: 12, opacity: busy ? .6 : 1 }}><Text style={{ color: colors.fg.default, fontFamily: fonts.sans.semibold, textAlign: "center" }}>{busy ? 'Connecting…' : wallet ? 'Reconnect MetaMask' : 'Connect MetaMask'}</Text></Pressable>
       {wallet ? <Pressable disabled={busy} onPress={disconnectWallet} style={{ backgroundColor: "#fa6838", borderRadius: 10, padding: 12, opacity: busy ? .6 : 1, marginTop: 10 }}><Text style={{ color: "#ffffff", fontFamily: fonts.sans.semibold, textAlign: "center" }}>{busy ? "Removing..." : "Forget Saved Wallet"}</Text></Pressable> : null}
       {error ? <Text style={{ color: colors.fg.muted, fontFamily: fonts.sans.regular, fontSize: 12 }}>{error}</Text> : null}
       <Pressable accessibilityRole="button" onPress={() => router.push('/models')} style={{ padding: 12, borderRadius: 10, backgroundColor: colors.bg.base }}><Text style={{ color: colors.fg.default, fontFamily: fonts.sans.semibold }}>Open model tools</Text></Pressable>

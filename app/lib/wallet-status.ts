@@ -6,7 +6,7 @@ export type WalletStatus = { address: string; network: "Testnet" | "Mainnet" };
 export const isWalletStatus = (value: unknown): value is WalletStatus => {
   if (!value || typeof value !== "object") return false;
   const { address, network } = value as Partial<WalletStatus>;
-  return typeof address === "string" && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address) && network === "Mainnet";
+  return typeof address === "string" && /^G[A-Z2-7]{55}$/.test(address) && network === "Mainnet";
 };
 
 export const getWalletStatus = async (): Promise<WalletStatus | null> => {
