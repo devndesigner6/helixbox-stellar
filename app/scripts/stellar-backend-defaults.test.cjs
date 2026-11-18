@@ -16,3 +16,10 @@ test('Stellar app does not mount the legacy automatic mandate runner', () => {
   const layout = readFileSync(resolve(__dirname, '../app/_layout.tsx'),'utf8');
   assert.doesNotMatch(layout, /ModelMandateRunner/);
 });
+
+test('Stellar app uses an independent Expo project slug and Android identifier', () => {
+  const config = JSON.parse(readFileSync(resolve(__dirname, '../app.json'),'utf8'));
+  assert.equal(config.expo.slug, 'helixbox-stellar');
+  assert.equal(config.expo.android.package, 'xyz.helixbox.stellar');
+  assert.notEqual(config.expo.extra.eas?.projectId, '40572439-3902-43f8-bfff-b7e98b33c18a');
+});
