@@ -6,7 +6,7 @@ The code is experimental and must not be used on mainnet or as a payment-securit
 
 ## Testnet evidence
 
-On 18 November 2026, the verifier was deployed on Stellar testnet at `CDM5ULTTPRNQEQBTWB6RPIH7SPRKWTPOQUVNZPWVDRDFFF64JQHHFBLU`. The deployment transaction is `b5cf89118593aa9f5099b471c2952ab101ece6ab5b6a94949ad3e768f55bddeb`. A testnet RPC simulation accepted a newly generated valid signature and rejected that signature for an altered message. This is a simulation of invocation, not an on-chain invocation transaction.
+On 18 November 2026, the verifier was deployed on Stellar testnet at `CDM5ULTTPRNQEQBTWB6RPIH7SPRKWTPOQUVNZPWVDRDFFF64JQHHFBLU`. The deployment transaction is `b5cf89118593aa9f5099b471c2952ab101ece6ab5b6a94949ad3e768f55bddeb`. A testnet RPC simulation accepted a newly generated valid signature and rejected that signature for an altered message. A separate valid invocation was also submitted successfully in testnet transaction `4c702eb930070a31b18ad49266ed3bead66d3716789c527bb92beb7c12cba6ab`; the altered-message rejection was simulated, not submitted as a transaction.
 
 One successful simulation reported 2,050,028 CPU instructions, zero disk-read bytes, zero write bytes, and a minimum resource fee of 15,293 stroops. These figures are one sample, not a performance guarantee or a mainnet fee quote. They do not establish x402 or wallet compatibility.
 
