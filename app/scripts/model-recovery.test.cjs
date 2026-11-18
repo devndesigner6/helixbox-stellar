@@ -8,7 +8,7 @@ const source=ts.transpileModule(readFileSync(resolve(__dirname,'../hooks/useMode
 const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{promise,resolve};};
 // A deterministic hook host; only React scheduling, storage and HTTP edges are replaced.
 function host({catalogFails=false,pendingQuote}={}){
-  const slots=[];let cursor=0;let effects=[];let contextCode='A';let output;
+  const slots=[];const requests=[];let cursor=0;let effects=[];let contextCode='A';let output;
   const same=(a,b)=>a&&b&&a.length===b.length&&a.every((x,i)=>Object.is(x,b[i]));
   const hooks={
     useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,value=>{slots[i].value=typeof value==='function'?value(slots[i].value):value;}];},
@@ -26,6 +26,7 @@ function host({catalogFails=false,pendingQuote}={}){
     if(name.includes('model-tools'))return{
       activeModelPurchase:{get:async code=>code==='A'?'job-A':null,set:async()=>{}},
       modelRequest:async(path,password,body)=>{
+        requests.push(path);
         if(path===''){if(catalogFails)throw Error('catalog offline');return{models:[]};}
         if(path==='/quotes'&&pendingQuote)return pendingQuote.promise;
         if(path==='/purchases')return{purchases:[]};
@@ -36,16 +37,19 @@ function host({catalogFails=false,pendingQuote}={}){
   }});
   const render=()=>{cursor=0;output=module.exports.useModelTools();const pending=effects;effects=[];pending.forEach(fn=>fn());return output;};
   const flush=async()=>{for(let i=0;i<8;i++){await new Promise(r=>setImmediate(r));render();}return output;};
-  render();return{render,flush,switchTo:code=>{contextCode=code;return render();}};
+  render();return{render,flush,requests,switchTo:code=>{contextCode=code;return render();}};
 }
-test('catalog outage cannot prevent private purchase recovery',async()=>{
+test('catalog outage does not trigger legacy purchase recovery',async()=>{
   const app=host({catalogFails:true});const output=await app.flush();
-  assert.equal(output.purchase?.result.text,'private A');
+  assert.equal(output.purchase,null);
+  assert.equal(output.error,'Live catalog unavailable');
+  assert.deepEqual(app.requests,['']);
 });
-test('a new pairing with no saved purchase immediately hides the old result',async()=>{
-  const app=host();assert.equal((await app.flush()).purchase?.result.text,'private A');
+test('switching pairing does not request legacy purchases',async()=>{
+  const app=host();assert.equal((await app.flush()).purchase,null);
   assert.equal(app.switchTo('B').purchase,null);
   assert.equal((await app.flush()).purchase,null);
+  assert.deepEqual(app.requests,['']);
 });
 test('switching pairing during a quote discards the old asynchronous response',async()=>{
   const pendingQuote=deferred();const app=host({pendingQuote});let output=await app.flush();

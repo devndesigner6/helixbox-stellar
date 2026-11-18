@@ -45,16 +45,15 @@ export function useModelTools() {
         const stored=sessionCode?(await getPairedSessions()).find(item=>item.sessionCode===sessionCode)??null:await getStoredSession();
         if(!isCurrent(ticket)||!stored)return;
         const scope={...ticket,session:stored};session.current=scope;
-        update(scope,{paired:true});await recover(scope);
+        update(scope,{paired:true});
       }catch(cause){update(ticket,{error:cause instanceof Error?cause.message:'Purchase recovery failed'});}
     })();
     return()=>{revision.current++;session.current=null;};
   },[key,sessionCode,getPairedSessions,getStoredSession,isCurrent,recover,update]);
   useEffect(()=>{void refreshCatalog();},[refreshCatalog]);
   const reload=useCallback(async()=>{
-    const scope=session.current;
-    await Promise.all([refreshCatalog(),scope?recover(scope).catch(cause=>update(scope,{error:cause instanceof Error?cause.message:'Purchase recovery failed'})):Promise.resolve()]);
-  },[refreshCatalog,recover,update]);
+    await refreshCatalog();
+  },[refreshCatalog]);
   useEffect(()=>{
     const listener=AppState.addEventListener('change',state=>{if(state==='active')void reload();});
     return()=>listener.remove();

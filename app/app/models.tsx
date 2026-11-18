@@ -1,5 +1,4 @@
 import Header from '@/components/Header';
-import ModelPurchaseResult from '@/components/ModelPurchaseResult';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useModelTools } from '@/hooks/useModelTools';
 import type { ModelKind, ToolModel } from '@/lib/model-tools';
@@ -39,7 +38,6 @@ export default function ModelTools() {
         <Text style={{...text,fontSize:18,fontFamily:fonts.sans.semibold}}>A model for the task.</Text>
         <Text style={muted}>Your workspace remains free. Stellar model payments are being integrated and are not available yet.</Text>
         <Text style={muted}>{tools.catalog?.generationStatus??'Fetching the live model catalog…'}</Text>
-        {!tools.paired?<Text style={muted}>Pair your laptop to create quotes and recover purchases.</Text>:null}
         {tools.catalog?.warnings.map(warning=><Text key={warning} style={muted}>{warning}</Text>)}
         <View style={{flexDirection:'row',gap:8}}>{(['chat','image','voice'] as ModelKind[]).map(value=>
           <Pressable key={value} accessibilityRole="tab" accessibilityState={{selected:kind===value}} onPress={()=>changeKind(value)} style={{...button,flex:1,backgroundColor:kind===value?colors.bg.elevated:colors.bg.raised}}>
@@ -73,7 +71,6 @@ export default function ModelTools() {
         </>}
         {tools.busy?<ActivityIndicator accessibilityLabel="Loading model operation" color={colors.fg.muted}/>:null}
         {tools.error?<Text accessibilityRole="alert" selectable style={text}>{tools.error}</Text>:null}
-        {tools.purchase?<ModelPurchaseResult key={tools.purchase.id} purchase={tools.purchase} busy={tools.busy} onPay={()=>void tools.pay()} onResume={()=>void tools.resume()} onRefresh={()=>void tools.open(tools.purchase!.id)}/>:null}
       </View>}
       ListEmptyComponent={!selected&&!tools.busy?<Text style={muted}>{tools.catalog?'No matching models.':'The live catalog could not load. No sample models are shown.'}</Text>:null}
       renderItem={({item})=><Pressable accessibilityRole="button" style={button} onPress={()=>{setSelected(item);setVoice('');setConsent(false);}}>
@@ -82,13 +79,7 @@ export default function ModelTools() {
         <Text numberOfLines={2} style={muted}>{item.description}</Text>
       </Pressable>}
       ListFooterComponent={<View style={{gap:12,paddingTop:16}}>
-        <Pressable accessibilityRole="button" disabled={tools.busy} style={button} onPress={()=>void tools.reload()}><Text style={text}>Refresh catalog and purchases</Text></Pressable>
-        <Text style={{...text,fontFamily:fonts.sans.semibold}}>Recent purchases</Text>
-        {!tools.history.length?<Text style={muted}>No purchases found for this pairing.</Text>:tools.history.map(item=>
-          <Pressable accessibilityRole="button" key={item.id} style={button} disabled={tools.busy} onPress={()=>void tools.open(item.id)}>
-            <Text style={text}>{item.terms.modelId} · {item.state.replace(/_/g,' ')}</Text>
-          </Pressable>)}
-        <Text style={muted}>Prompts and results expire after 24 hours. Receipts are retained. Uncertain settlements are held for reconciliation, never automatically charged again.</Text>
+        <Pressable accessibilityRole="button" disabled={tools.busy} style={button} onPress={()=>void tools.reload()}><Text style={text}>Refresh catalog</Text></Pressable>
       </View>}
     />
   </View>;

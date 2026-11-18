@@ -1,5 +1,6 @@
 .DS_Store
 pty/target/
+contracts/*/target/
 gateway/manager.db
 gateway/manager.db-shm
 gateway/manager.db-wal
