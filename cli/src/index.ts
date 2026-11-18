@@ -2,7 +2,6 @@
 
 import { WebSocket } from "ws";
 import qrcode from "qrcode-terminal";
-import shell from "shelljs";
 import { createAiManager, isAiBackend } from "./ai/index.js";
 import {configureModelTools} from './ai/model-tools.js';
 import type { AiManager, AiBackend } from "./ai/index.js";
@@ -770,10 +769,6 @@ async function handleFsGrep(payload: Record<string, unknown>): Promise<Record<st
     throw Object.assign(new Error("pattern must be a valid regular expression"), { code: "EINVAL" });
   }
   const rootIgnore = await loadGitignore(ROOT_DIR);
-  const previousSilent = shell.config.silent;
-  shell.config.silent = true;
-
-  try {
     async function searchFile(filePath: string, relativePath: string): Promise<void> {
       if (matches.length >= maxResults) return;
 
@@ -839,10 +834,6 @@ async function handleFsGrep(payload: Record<string, unknown>): Promise<Record<st
     } else {
       await searchFile(safePath, reqPath);
     }
-  } finally {
-    shell.config.silent = previousSilent;
-  }
-
   return { matches };
 }
 
