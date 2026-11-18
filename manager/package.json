@@ -1,0 +1,28 @@
+{
+  "name": "helixbox-manager",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.6",
+    "@solana/kit": "8.6.0",
+    "@stellar/stellar-sdk": "16.4.1",
+    "@x402/core": "2.30.0",
+    "@x402/fetch": "2.30.0",
+    "@x402/hono": "2.30.0",
+    "@x402/stellar": "2.30.0",
+    "@x402/svm": "2.30.0",
+    "dotenv": "^17.4.2",
+    "hono": "4.13.17",
+    "mpg123-decoder": "1.0.3",
+    "pngjs": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pngjs": "6.0.5",
+    "typescript": "^5.0.0"
+  }
+}
