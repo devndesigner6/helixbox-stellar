@@ -793,12 +793,12 @@ function startGateway(): void {
     });
   };
 
-  const scheduleManagerReconnect = (): void => {
+  const scheduleManagerReconnect = (delayMs = 1500): void => {
     if (managerControlReconnectTimer) return;
     managerControlReconnectTimer = setTimeout(() => {
       managerControlReconnectTimer = null;
       connectManagerControl();
-    }, 1500);
+    }, delayMs);
   };
 
   const connectManagerControl = (): void => {
@@ -835,6 +835,7 @@ function startGateway(): void {
       const code = evt.code !== 1000 ? ` (code ${evt.code})` : "";
       if (evt.code === 1008) {
         console.error(`[manager-control] auth rejected by manager${reason} — check PROXY_PASSWORD matches what was entered in the UI`);
+        scheduleManagerReconnect(30000);
       } else {
         console.warn(`[manager-control] disconnected${code}${reason} — will reconnect in 1.5s`);
         scheduleManagerReconnect();
@@ -1477,6 +1478,7 @@ function startGateway(): void {
     },
   });
 
+  connectManagerControl();
   console.log(`[proxy] started — port=${server.port} | public=${publicUrl ?? "not set"} | manager=${managerUrl ?? "none"}`);
 }
 
